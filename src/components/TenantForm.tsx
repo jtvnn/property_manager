@@ -77,8 +77,7 @@ export function TenantForm({ isOpen, onClose, onSubmit, tenant, title }: TenantF
     if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email format'
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required'
     if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required'
-    if (!formData.emergencyContactName.trim()) newErrors.emergencyContactName = 'Emergency contact name is required'
-    if (!formData.emergencyContactPhone.trim()) newErrors.emergencyContactPhone = 'Emergency contact phone is required'
+    // Emergency contact fields are now optional
 
     // Validate date of birth (must be at least 18 years old)
     if (formData.dateOfBirth) {

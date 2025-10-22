@@ -43,15 +43,41 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function fetchDashboardData() {
+      console.log('Starting dashboard data fetch...')
       try {
-        const response = await fetch('/api/dashboard')
+        console.log('Fetching from: /api/dashboard')
+        
+        // Add timeout to prevent infinite loading
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+        
+        const response = await fetch('/api/dashboard', {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+        
+        clearTimeout(timeoutId)
+        console.log('Response status:', response.status)
+        console.log('Response ok:', response.ok)
+        
         if (response.ok) {
           const dashboardData = await response.json()
+          console.log('Dashboard data received:', dashboardData)
           setData(dashboardData)
+        } else {
+          console.error('Response not ok:', response.status, response.statusText)
+          const errorText = await response.text()
+          console.error('Error response body:', errorText)
         }
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error)
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.error('Request timed out after 10 seconds')
+        }
       } finally {
+        console.log('Dashboard fetch completed, setting loading to false')
         setLoading(false)
       }
     }

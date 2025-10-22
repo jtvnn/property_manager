@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { TenantForm } from '@/components/TenantForm'
 import { TenantDetailsModal } from '@/components/TenantDetailsModal'
+import { LeaseForm } from '@/components/LeaseForm'
 
 interface Property {
   id: string
@@ -48,6 +49,8 @@ export default function TenantsPage() {
   const [editingTenant, setEditingTenant] = useState<Tenant | null>(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null)
+  const [showLeaseForm, setShowLeaseForm] = useState(false)
+  const [leaseFormTenant, setLeaseFormTenant] = useState<Tenant | null>(null)
 
   useEffect(() => {
     async function fetchTenants() {
@@ -91,7 +94,10 @@ export default function TenantsPage() {
   }
 
   const getCurrentLease = (tenant: Tenant) => {
-    return tenant.leases.find(lease => lease.status === 'ACTIVE')
+    // Consider both ACTIVE and PENDING leases as current
+    const currentLease = tenant.leases.find(lease => lease.status === 'ACTIVE' || lease.status === 'PENDING')
+    console.log(`Tenant ${tenant.firstName} ${tenant.lastName}:`, tenant.leases.length, 'leases, current lease:', currentLease?.status)
+    return currentLease
   }
 
   const handleAddTenant = async (tenantData: Omit<Tenant, 'id' | 'createdAt' | 'updatedAt' | 'leases'>) => {
@@ -169,6 +175,48 @@ export default function TenantsPage() {
   const closeDetailsModal = () => {
     setShowDetailsModal(false)
     setSelectedTenant(null)
+  }
+
+  const openLeaseForm = (tenant: Tenant) => {
+    setLeaseFormTenant(tenant)
+    setShowLeaseForm(true)
+  }
+
+  const closeLeaseForm = () => {
+    setShowLeaseForm(false)
+    setLeaseFormTenant(null)
+  }
+
+  const handleCreateLease = async (leaseData: {
+    tenantId: string
+    propertyId: string
+    startDate: string
+    endDate: string
+    monthlyRent: number
+    securityDeposit: number
+    status: string
+  }) => {
+    try {
+      const response = await fetch('/api/leases', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(leaseData),
+      })
+
+      if (response.ok) {
+        // Refresh tenants to get updated lease information
+        const tenantsResponse = await fetch('/api/tenants')
+        if (tenantsResponse.ok) {
+          const tenantsData = await tenantsResponse.json()
+          setTenants(tenantsData)
+        }
+        closeLeaseForm()
+      }
+    } catch (error) {
+      console.error('Failed to create lease:', error)
+    }
   }
 
   if (loading) {
@@ -396,7 +444,10 @@ export default function TenantsPage() {
                       >
                         View Details
                       </button>
-                      <button className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 px-3 py-2 rounded text-sm font-medium">
+                      <button 
+                        onClick={() => openLeaseForm(tenant)}
+                        className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 px-3 py-2 rounded text-sm font-medium"
+                      >
                         New Lease
                       </button>
                     </div>
@@ -447,6 +498,15 @@ export default function TenantsPage() {
         onEdit={openEditModal}
         onDelete={handleDeleteTenant}
       />
+
+      {/* Lease Form Modal */}
+      {showLeaseForm && leaseFormTenant && (
+        <LeaseForm
+          tenant={leaseFormTenant}
+          onSubmit={handleCreateLease}
+          onCancel={closeLeaseForm}
+        />
+      )}
     </div>
   )
 }

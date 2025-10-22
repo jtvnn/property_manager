@@ -1,150 +1,125 @@
 import { NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
 
-// Mock payment data
-const mockPayments = [
-  {
-    id: '1',
-    amount: 1200,
-    type: 'RENT',
-    status: 'PAID',
-    dueDate: '2025-10-01',
-    paidDate: '2025-09-30',
-    method: 'BANK_TRANSFER',
-    notes: 'October rent payment',
-    tenantId: '1',
-    leaseId: '1',
-    tenant: {
-      firstName: 'John',
-      lastName: 'Smith'
-    },
-    lease: {
-      property: {
-        name: 'Sunset Apartments - Unit 3A'
-      }
-    },
-    createdAt: new Date('2025-09-30'),
-    updatedAt: new Date('2025-09-30')
-  },
-  {
-    id: '2',
-    amount: 1200,
-    type: 'RENT',
-    status: 'PENDING',
-    dueDate: '2025-11-01',
-    method: null,
-    notes: 'November rent payment',
-    tenantId: '1',
-    leaseId: '1',
-    tenant: {
-      firstName: 'John',
-      lastName: 'Smith'
-    },
-    lease: {
-      property: {
-        name: 'Sunset Apartments - Unit 3A'
-      }
-    },
-    createdAt: new Date('2025-10-01'),
-    updatedAt: new Date('2025-10-01')
-  },
-  {
-    id: '3',
-    amount: 1500,
-    type: 'RENT',
-    status: 'PAID',
-    dueDate: '2025-10-01',
-    paidDate: '2025-10-02',
-    method: 'CHECK',
-    notes: 'October rent payment',
-    tenantId: '2',
-    leaseId: '2',
-    tenant: {
-      firstName: 'Sarah',
-      lastName: 'Johnson'
-    },
-    lease: {
-      property: {
-        name: 'Green Valley Homes - Unit B'
-      }
-    },
-    createdAt: new Date('2025-10-02'),
-    updatedAt: new Date('2025-10-02')
-  },
-  {
-    id: '4',
-    amount: 1500,
-    type: 'RENT',
-    status: 'OVERDUE',
-    dueDate: '2025-11-01',
-    method: null,
-    notes: 'November rent payment - OVERDUE',
-    tenantId: '2',
-    leaseId: '2',
-    tenant: {
-      firstName: 'Sarah',
-      lastName: 'Johnson'
-    },
-    lease: {
-      property: {
-        name: 'Green Valley Homes - Unit B'
-      }
-    },
-    createdAt: new Date('2025-11-01'),
-    updatedAt: new Date('2025-11-01')
-  },
-  {
-    id: '5',
-    amount: 50,
-    type: 'LATE_FEE',
-    status: 'PENDING',
-    dueDate: '2025-11-05',
-    method: null,
-    notes: 'Late fee for November rent',
-    tenantId: '2',
-    leaseId: '2',
-    tenant: {
-      firstName: 'Sarah',
-      lastName: 'Johnson'
-    },
-    lease: {
-      property: {
-        name: 'Green Valley Homes - Unit B'
-      }
-    },
-    createdAt: new Date('2025-11-05'),
-    updatedAt: new Date('2025-11-05')
-  },
-  {
-    id: '6',
-    amount: 800,
-    type: 'RENT',
-    status: 'PAID',
-    dueDate: '2025-10-15',
-    paidDate: '2025-10-14',
-    method: 'CASH',
-    notes: 'October rent payment',
-    tenantId: '3',
-    leaseId: '3',
-    tenant: {
-      firstName: 'Mike',
-      lastName: 'Davis'
-    },
-    lease: {
-      property: {
-        name: 'Downtown Loft - Studio 12'
-      }
-    },
-    createdAt: new Date('2025-10-14'),
-    updatedAt: new Date('2025-10-14')
+// Simple file-based storage for development
+const paymentsFilePath = path.join(process.cwd(), 'data', 'payments.json')
+const tenantsFilePath = path.join(process.cwd(), 'data', 'tenants.json')
+const leasesFilePath = path.join(process.cwd(), 'data', 'leases.json')
+const propertiesFilePath = path.join(process.cwd(), 'data', 'properties.json')
+
+function ensureDataDirectory() {
+  const dataDir = path.dirname(paymentsFilePath)
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
   }
-]
+}
+
+function readPayments() {
+  ensureDataDirectory()
+  if (!fs.existsSync(paymentsFilePath)) {
+    return []
+  }
+  try {
+    const data = fs.readFileSync(paymentsFilePath, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('Error reading payments:', error)
+    return []
+  }
+}
+
+function readTenants() {
+  ensureDataDirectory()
+  if (!fs.existsSync(tenantsFilePath)) {
+    return []
+  }
+  try {
+    const data = fs.readFileSync(tenantsFilePath, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('Error reading tenants:', error)
+    return []
+  }
+}
+
+function readLeases() {
+  ensureDataDirectory()
+  if (!fs.existsSync(leasesFilePath)) {
+    return []
+  }
+  try {
+    const data = fs.readFileSync(leasesFilePath, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('Error reading leases:', error)
+    return []
+  }
+}
+
+function readProperties() {
+  ensureDataDirectory()
+  if (!fs.existsSync(propertiesFilePath)) {
+    return []
+  }
+  try {
+    const data = fs.readFileSync(propertiesFilePath, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('Error reading properties:', error)
+    return []
+  }
+}
+
+function writePayments(payments: any[]) {
+  ensureDataDirectory()
+  try {
+    fs.writeFileSync(paymentsFilePath, JSON.stringify(payments, null, 2))
+  } catch (error) {
+    console.error('Error writing payments:', error)
+    throw error
+  }
+}
+
+function generateId() {
+  return Date.now().toString() + Math.random().toString(36).substr(2, 9)
+}
 
 export async function GET() {
   try {
-    // Return all payments with tenant and property information
-    return NextResponse.json(mockPayments)
+    const payments = readPayments()
+    const tenants = readTenants()
+    const leases = readLeases()
+    const properties = readProperties()
+
+    // Populate payments with tenant and lease information
+    const populatedPayments = payments.map((payment: any) => {
+      const tenant = tenants.find((t: any) => t.id === payment.tenantId)
+      const lease = leases.find((l: any) => l.id === payment.leaseId)
+      const property = lease ? properties.find((p: any) => p.id === lease.propertyId) : null
+
+      return {
+        ...payment,
+        tenant: tenant ? {
+          id: tenant.id,
+          firstName: tenant.firstName,
+          lastName: tenant.lastName,
+          email: tenant.email
+        } : null,
+        lease: lease ? {
+          id: lease.id,
+          property: property ? {
+            id: property.id,
+            name: property.name,
+            address: property.address
+          } : null
+        } : null
+      }
+    })
+
+    return NextResponse.json(populatedPayments)
   } catch (error) {
-    console.error('Failed to fetch payments:', error)
+    console.error('Error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch payments' },
       { status: 500 }
@@ -156,22 +131,124 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
+    // Validate required fields
+    if (!body.amount || !body.tenantId || !body.dueDate) {
+      return NextResponse.json(
+        { error: 'Missing required fields: amount, tenantId, dueDate' },
+        { status: 400 }
+      )
+    }
+
+    const payments = readPayments()
+    
     // Create new payment
     const newPayment = {
-      id: (mockPayments.length + 1).toString(),
-      ...body,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      id: generateId(),
+      amount: parseFloat(body.amount),
+      type: body.type || 'RENT',
+      status: body.status || 'PENDING',
+      dueDate: body.dueDate,
+      paidDate: body.paidDate || null,
+      method: body.method || null,
+      notes: body.notes || '',
+      tenantId: body.tenantId,
+      leaseId: body.leaseId || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     }
-    
-    // In a real app, this would save to database
-    mockPayments.push(newPayment)
-    
+
+    payments.push(newPayment)
+    writePayments(payments)
+
     return NextResponse.json(newPayment, { status: 201 })
   } catch (error) {
-    console.error('Failed to create payment:', error)
+    console.error('Error:', error)
     return NextResponse.json(
       { error: 'Failed to create payment' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Payment ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const body = await request.json()
+    const payments = readPayments()
+    
+    const paymentIndex = payments.findIndex((p: any) => p.id === id)
+    if (paymentIndex === -1) {
+      return NextResponse.json(
+        { error: 'Payment not found' },
+        { status: 404 }
+      )
+    }
+
+    // Update payment
+    const updatedPayment = {
+      ...payments[paymentIndex],
+      amount: body.amount ? parseFloat(body.amount) : payments[paymentIndex].amount,
+      type: body.type || payments[paymentIndex].type,
+      status: body.status || payments[paymentIndex].status,
+      dueDate: body.dueDate || payments[paymentIndex].dueDate,
+      paidDate: body.paidDate || payments[paymentIndex].paidDate,
+      method: body.method || payments[paymentIndex].method,
+      notes: body.notes !== undefined ? body.notes : payments[paymentIndex].notes,
+      updatedAt: new Date().toISOString(),
+    }
+
+    payments[paymentIndex] = updatedPayment
+    writePayments(payments)
+
+    return NextResponse.json(updatedPayment)
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json(
+      { error: 'Failed to update payment' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Payment ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const payments = readPayments()
+    const paymentIndex = payments.findIndex((p: any) => p.id === id)
+    
+    if (paymentIndex === -1) {
+      return NextResponse.json(
+        { error: 'Payment not found' },
+        { status: 404 }
+      )
+    }
+
+    payments.splice(paymentIndex, 1)
+    writePayments(payments)
+
+    return NextResponse.json({ message: 'Payment deleted successfully' })
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete payment' },
       { status: 500 }
     )
   }

@@ -1,189 +1,139 @@
 import { NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
 
-// Mock maintenance request data
-const mockMaintenanceRequests = [
-  {
-    id: '1',
-    title: 'Leaky Faucet in Kitchen',
-    description: 'The kitchen faucet has been dripping constantly for the past week. It\'s getting worse and wasting water.',
-    category: 'PLUMBING',
-    priority: 'MEDIUM',
-    status: 'OPEN',
-    tenantId: '1',
-    propertyId: '1',
-    assignedTo: null,
-    estimatedCost: 150,
-    actualCost: null,
-    requestedDate: '2025-10-15',
-    scheduledDate: null,
-    completedDate: null,
-    notes: 'Tenant reports constant dripping, may need new faucet parts',
-    tenant: {
-      firstName: 'John',
-      lastName: 'Smith',
-      phone: '(555) 123-4567',
-      email: 'john.smith@email.com'
-    },
-    property: {
-      name: 'Sunset Apartments - Unit 3A',
-      address: '123 Sunset Blvd, Apt 3A'
-    },
-    createdAt: new Date('2025-10-15'),
-    updatedAt: new Date('2025-10-15')
-  },
-  {
-    id: '2',
-    title: 'Broken Dishwasher',
-    description: 'Dishwasher stopped working completely. No power, won\'t turn on. Checked circuit breaker and it\'s fine.',
-    category: 'APPLIANCE',
-    priority: 'HIGH',
-    status: 'IN_PROGRESS',
-    tenantId: '2',
-    propertyId: '2',
-    assignedTo: 'Mike\'s Appliance Repair',
-    estimatedCost: 300,
-    actualCost: null,
-    requestedDate: '2025-10-12',
-    scheduledDate: '2025-10-20',
-    completedDate: null,
-    notes: 'Scheduled repair with Mike\'s Appliance Repair for Oct 20th',
-    tenant: {
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      phone: '(555) 987-6543',
-      email: 'sarah.johnson@email.com'
-    },
-    property: {
-      name: 'Green Valley Homes - Unit B',
-      address: '456 Green Valley Dr, Unit B'
-    },
-    createdAt: new Date('2025-10-12'),
-    updatedAt: new Date('2025-10-17')
-  },
-  {
-    id: '3',
-    title: 'HVAC System Not Heating',
-    description: 'Heating system is not working properly. Temperature won\'t go above 65°F even when set to 75°F.',
-    category: 'HVAC',
-    priority: 'HIGH',
-    status: 'SCHEDULED',
-    tenantId: '1',
-    propertyId: '1',
-    assignedTo: 'CoolAir HVAC Services',
-    estimatedCost: 450,
-    actualCost: null,
-    requestedDate: '2025-10-10',
-    scheduledDate: '2025-10-21',
-    completedDate: null,
-    notes: 'Emergency HVAC repair scheduled. Tenant has space heater as temporary solution.',
-    tenant: {
-      firstName: 'John',
-      lastName: 'Smith',
-      phone: '(555) 123-4567',
-      email: 'john.smith@email.com'
-    },
-    property: {
-      name: 'Sunset Apartments - Unit 3A',
-      address: '123 Sunset Blvd, Apt 3A'
-    },
-    createdAt: new Date('2025-10-10'),
-    updatedAt: new Date('2025-10-18')
-  },
-  {
-    id: '4',
-    title: 'Ceiling Light Fixture Loose',
-    description: 'Living room ceiling light fixture is loose and wobbling. Concerned it might fall.',
-    category: 'ELECTRICAL',
-    priority: 'MEDIUM',
-    status: 'COMPLETED',
-    tenantId: '3',
-    propertyId: '3',
-    assignedTo: 'Bright Electric Co.',
-    estimatedCost: 100,
-    actualCost: 85,
-    requestedDate: '2025-10-05',
-    scheduledDate: '2025-10-08',
-    completedDate: '2025-10-08',
-    notes: 'Fixed loose mounting bracket and replaced worn screws. Fixture is now secure.',
-    tenant: {
-      firstName: 'Mike',
-      lastName: 'Davis',
-      phone: '(555) 555-1234',
-      email: 'mike.davis@email.com'
-    },
-    property: {
-      name: 'Downtown Loft - Studio 12',
-      address: '789 Downtown Ave, Studio 12'
-    },
-    createdAt: new Date('2025-10-05'),
-    updatedAt: new Date('2025-10-08')
-  },
-  {
-    id: '5',
-    title: 'Garbage Disposal Jammed',
-    description: 'Kitchen garbage disposal is jammed and making grinding noises. Won\'t turn on properly.',
-    category: 'PLUMBING',
-    priority: 'LOW',
-    status: 'OPEN',
-    tenantId: '2',
-    propertyId: '2',
-    assignedTo: null,
-    estimatedCost: 120,
-    actualCost: null,
-    requestedDate: '2025-10-18',
-    scheduledDate: null,
-    completedDate: null,
-    notes: 'Tenant advised to avoid using disposal until repair. Low priority as kitchen sink still functional.',
-    tenant: {
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      phone: '(555) 987-6543',
-      email: 'sarah.johnson@email.com'
-    },
-    property: {
-      name: 'Green Valley Homes - Unit B',
-      address: '456 Green Valley Dr, Unit B'
-    },
-    createdAt: new Date('2025-10-18'),
-    updatedAt: new Date('2025-10-18')
-  },
-  {
-    id: '6',
-    title: 'Window Won\'t Close Properly',
-    description: 'Bedroom window is stuck and won\'t close completely. Security concern and energy efficiency issue.',
-    category: 'GENERAL',
-    priority: 'MEDIUM',
-    status: 'CANCELLED',
-    tenantId: '3',
-    propertyId: '3',
-    assignedTo: null,
-    estimatedCost: 200,
-    actualCost: 0,
-    requestedDate: '2025-10-01',
-    scheduledDate: null,
-    completedDate: null,
-    notes: 'Tenant found DIY solution and fixed the issue themselves. Request cancelled.',
-    tenant: {
-      firstName: 'Mike',
-      lastName: 'Davis',
-      phone: '(555) 555-1234',
-      email: 'mike.davis@email.com'
-    },
-    property: {
-      name: 'Downtown Loft - Studio 12',
-      address: '789 Downtown Ave, Studio 12'
-    },
-    createdAt: new Date('2025-10-01'),
-    updatedAt: new Date('2025-10-03')
+interface MaintenanceRequest {
+  id: string
+  title: string
+  description: string
+  category: string
+  priority: string
+  status: string
+  propertyId: string
+  tenantId: string | null
+  assignedTo: string | null
+  estimatedCost: number | null
+  actualCost: number | null
+  scheduledDate: string | null
+  completedDate: string | null
+  notes: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface Property {
+  id: string
+  name: string
+  address: string
+  type: string
+  bedrooms: number
+  bathrooms: number
+  rent: number
+  status: string
+  ownerId: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface Tenant {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  emergencyContact: string
+  emergencyPhone: string
+  createdAt: string
+  updatedAt: string
+}
+
+// Simple file-based storage for development
+const maintenanceFilePath = path.join(process.cwd(), 'data', 'maintenance.json')
+
+function ensureDataDirectory() {
+  const dataDir = path.dirname(maintenanceFilePath)
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
   }
-]
+}
+
+function readMaintenance(): MaintenanceRequest[] {
+  ensureDataDirectory()
+  if (!fs.existsSync(maintenanceFilePath)) {
+    return []
+  }
+  try {
+    const data = fs.readFileSync(maintenanceFilePath, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('Error reading maintenance:', error)
+    return []
+  }
+}
+
+function writeMaintenance(maintenance: MaintenanceRequest[]) {
+  ensureDataDirectory()
+  try {
+    fs.writeFileSync(maintenanceFilePath, JSON.stringify(maintenance, null, 2))
+  } catch (error) {
+    console.error('Error writing maintenance:', error)
+    throw error
+  }
+}
+
+function generateId() {
+  return Date.now().toString() + Math.random().toString(36).substr(2, 9)
+}
+
+function readProperties(): Property[] {
+  const propertiesFilePath = path.join(process.cwd(), 'data', 'properties.json')
+  if (!fs.existsSync(propertiesFilePath)) {
+    return []
+  }
+  try {
+    const data = fs.readFileSync(propertiesFilePath, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('Error reading properties:', error)
+    return []
+  }
+}
+
+function readTenants(): Tenant[] {
+  const tenantsFilePath = path.join(process.cwd(), 'data', 'tenants.json')
+  if (!fs.existsSync(tenantsFilePath)) {
+    return []
+  }
+  try {
+    const data = fs.readFileSync(tenantsFilePath, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('Error reading tenants:', error)
+    return []
+  }
+}
 
 export async function GET() {
   try {
-    // Return all maintenance requests with tenant and property information
-    return NextResponse.json(mockMaintenanceRequests)
+    const maintenance = readMaintenance()
+    const properties = readProperties()
+    const tenants = readTenants()
+    
+    // Populate maintenance requests with property and tenant data
+    const populatedMaintenance = maintenance.map((request: MaintenanceRequest) => {
+      const property = properties.find((p: Property) => p.id === request.propertyId)
+      const tenant = tenants.find((t: Tenant) => t.id === request.tenantId)
+      
+      return {
+        ...request,
+        property: property || null,
+        tenant: tenant || null
+      }
+    })
+    
+    return NextResponse.json(populatedMaintenance)
   } catch (error) {
-    console.error('Failed to fetch maintenance requests:', error)
+    console.error('Error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch maintenance requests' },
       { status: 500 }
@@ -195,24 +145,132 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
-    // Create new maintenance request
-    const newRequest = {
-      id: (mockMaintenanceRequests.length + 1).toString(),
-      ...body,
-      status: 'OPEN',
-      requestedDate: new Date().toISOString().split('T')[0],
-      createdAt: new Date(),
-      updatedAt: new Date()
+    // Validate required fields
+    if (!body.title || !body.description || !body.propertyId) {
+      return NextResponse.json(
+        { error: 'Missing required fields: title, description, propertyId' },
+        { status: 400 }
+      )
     }
+
+    const maintenance = readMaintenance()
     
-    // In a real app, this would save to database
-    mockMaintenanceRequests.push(newRequest)
-    
-    return NextResponse.json(newRequest, { status: 201 })
+    // Create new maintenance request
+    const newMaintenance = {
+      id: generateId(),
+      title: body.title,
+      description: body.description,
+      category: body.category || 'GENERAL',
+      priority: body.priority || 'MEDIUM',
+      status: body.status || 'OPEN',
+      propertyId: body.propertyId,
+      tenantId: body.tenantId || null,
+      assignedTo: body.assignedTo || null,
+      estimatedCost: body.estimatedCost ? parseFloat(body.estimatedCost) : null,
+      actualCost: body.actualCost ? parseFloat(body.actualCost) : null,
+      scheduledDate: body.scheduledDate || null,
+      completedDate: body.completedDate || null,
+      notes: body.notes || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    maintenance.push(newMaintenance)
+    writeMaintenance(maintenance)
+
+    return NextResponse.json(newMaintenance, { status: 201 })
   } catch (error) {
-    console.error('Failed to create maintenance request:', error)
+    console.error('Error:', error)
     return NextResponse.json(
       { error: 'Failed to create maintenance request' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Maintenance request ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const body = await request.json()
+    const maintenance = readMaintenance()
+    
+    const maintenanceIndex = maintenance.findIndex((m: MaintenanceRequest) => m.id === id)
+    if (maintenanceIndex === -1) {
+      return NextResponse.json(
+        { error: 'Maintenance request not found' },
+        { status: 404 }
+      )
+    }
+
+    // Update maintenance request
+    const updatedMaintenance = {
+      ...maintenance[maintenanceIndex],
+      title: body.title || maintenance[maintenanceIndex].title,
+      description: body.description || maintenance[maintenanceIndex].description,
+      category: body.category || maintenance[maintenanceIndex].category,
+      priority: body.priority || maintenance[maintenanceIndex].priority,
+      status: body.status || maintenance[maintenanceIndex].status,
+      assignedTo: body.assignedTo !== undefined ? body.assignedTo : maintenance[maintenanceIndex].assignedTo,
+      estimatedCost: body.estimatedCost ? parseFloat(body.estimatedCost) : maintenance[maintenanceIndex].estimatedCost,
+      actualCost: body.actualCost ? parseFloat(body.actualCost) : maintenance[maintenanceIndex].actualCost,
+      scheduledDate: body.scheduledDate !== undefined ? body.scheduledDate : maintenance[maintenanceIndex].scheduledDate,
+      completedDate: body.completedDate !== undefined ? body.completedDate : maintenance[maintenanceIndex].completedDate,
+      notes: body.notes !== undefined ? body.notes : maintenance[maintenanceIndex].notes,
+      updatedAt: new Date().toISOString(),
+    }
+
+    maintenance[maintenanceIndex] = updatedMaintenance
+    writeMaintenance(maintenance)
+
+    return NextResponse.json(updatedMaintenance)
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json(
+      { error: 'Failed to update maintenance request' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Maintenance request ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const maintenance = readMaintenance()
+    const maintenanceIndex = maintenance.findIndex((m: MaintenanceRequest) => m.id === id)
+    
+    if (maintenanceIndex === -1) {
+      return NextResponse.json(
+        { error: 'Maintenance request not found' },
+        { status: 404 }
+      )
+    }
+
+    maintenance.splice(maintenanceIndex, 1)
+    writeMaintenance(maintenance)
+
+    return NextResponse.json({ message: 'Maintenance request deleted successfully' })
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete maintenance request' },
       { status: 500 }
     )
   }

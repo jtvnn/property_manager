@@ -1,68 +1,51 @@
 import { NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
+
+// Simple file-based storage for development
+const dataFilePath = path.join(process.cwd(), 'data', 'properties.json')
+
+function ensureDataDirectory() {
+  const dataDir = path.dirname(dataFilePath)
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
+
+function readProperties() {
+  ensureDataDirectory()
+  if (!fs.existsSync(dataFilePath)) {
+    return []
+  }
+  try {
+    const data = fs.readFileSync(dataFilePath, 'utf8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.error('Error reading properties:', error)
+    return []
+  }
+}
+
+function writeProperties(properties: any[]) {
+  ensureDataDirectory()
+  try {
+    fs.writeFileSync(dataFilePath, JSON.stringify(properties, null, 2))
+  } catch (error) {
+    console.error('Error writing properties:', error)
+    throw error
+  }
+}
+
+function generateId() {
+  return Date.now().toString() + Math.random().toString(36).substr(2, 9)
+}
 
 export async function GET() {
   try {
-    // Mock properties data
-    const properties = [
-      {
-        id: '1',
-        name: 'Sunset Apartments Unit 1A',
-        address: '123 Main Street, Unit 1A',
-        city: 'Springfield',
-        state: 'IL',
-        zipCode: '62701',
-        type: 'APARTMENT',
-        bedrooms: 2,
-        bathrooms: 1.5,
-        squareFeet: 950,
-        description: 'Beautiful 2-bedroom apartment with modern amenities',
-        imageUrl: null,
-        rentAmount: 1200.00,
-        status: 'OCCUPIED',
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      {
-        id: '2',
-        name: 'Oak Hill House',
-        address: '456 Oak Street',
-        city: 'Springfield',
-        state: 'IL',
-        zipCode: '62702',
-        type: 'HOUSE',
-        bedrooms: 3,
-        bathrooms: 2,
-        squareFeet: 1500,
-        description: 'Spacious family home with backyard',
-        imageUrl: null,
-        rentAmount: 1800.00,
-        status: 'AVAILABLE',
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      {
-        id: '3',
-        name: 'Downtown Studio',
-        address: '789 City Center Blvd',
-        city: 'Springfield',
-        state: 'IL',
-        zipCode: '62703',
-        type: 'STUDIO',
-        bedrooms: 0,
-        bathrooms: 1,
-        squareFeet: 600,
-        description: 'Modern studio in the heart of downtown',
-        imageUrl: null,
-        rentAmount: 900.00,
-        status: 'MAINTENANCE',
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      }
-    ]
-
+    const properties = readProperties()
     return NextResponse.json(properties)
   } catch (error) {
-    console.error('Properties API error:', error)
+    console.error('Error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch properties' },
       { status: 500 }
@@ -74,20 +57,135 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
-    // Mock property creation
-    const newProperty = {
-      id: Date.now().toString(),
-      ...body,
-      imageUrl: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+    // Validate required fields
+    if (!body.name || !body.address || !body.city || !body.state || !body.zipCode || !body.rentAmount) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, address, city, state, zipCode, rentAmount' },
+        { status: 400 }
+      )
     }
+
+    const properties = readProperties()
+    
+    // Create new property
+    const newProperty = {
+      id: generateId(),
+      name: body.name,
+      address: body.address,
+      city: body.city,
+      state: body.state,
+      zipCode: body.zipCode,
+      type: body.type || 'APARTMENT',
+      bedrooms: parseInt(body.bedrooms) || 0,
+      bathrooms: parseFloat(body.bathrooms) || 0,
+      squareFeet: parseInt(body.squareFeet) || 0,
+      description: body.description || null,
+      rentAmount: parseFloat(body.rentAmount),
+      status: body.status || 'AVAILABLE',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      currentTenant: null,
+      leaseCount: 0,
+      maintenanceRequestCount: 0,
+    }
+
+    properties.push(newProperty)
+    writeProperties(properties)
 
     return NextResponse.json(newProperty, { status: 201 })
   } catch (error) {
-    console.error('Create property error:', error)
+    console.error('Error:', error)
     return NextResponse.json(
       { error: 'Failed to create property' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Property ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const body = await request.json()
+    const properties = readProperties()
+    
+    const propertyIndex = properties.findIndex((p: any) => p.id === id)
+    if (propertyIndex === -1) {
+      return NextResponse.json(
+        { error: 'Property not found' },
+        { status: 404 }
+      )
+    }
+
+    // Update property
+    const updatedProperty = {
+      ...properties[propertyIndex],
+      name: body.name,
+      address: body.address,
+      city: body.city,
+      state: body.state,
+      zipCode: body.zipCode,
+      type: body.type,
+      bedrooms: body.bedrooms ? parseInt(body.bedrooms) : undefined,
+      bathrooms: body.bathrooms ? parseFloat(body.bathrooms) : undefined,
+      squareFeet: body.squareFeet ? parseInt(body.squareFeet) : undefined,
+      description: body.description,
+      rentAmount: body.rentAmount ? parseFloat(body.rentAmount) : undefined,
+      status: body.status,
+      updatedAt: new Date().toISOString(),
+    }
+
+    properties[propertyIndex] = updatedProperty
+    writeProperties(properties)
+
+    return NextResponse.json(updatedProperty)
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json(
+      { error: 'Failed to update property' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Property ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const properties = readProperties()
+    const propertyIndex = properties.findIndex((p: any) => p.id === id)
+    
+    if (propertyIndex === -1) {
+      return NextResponse.json(
+        { error: 'Property not found' },
+        { status: 404 }
+      )
+    }
+
+    properties.splice(propertyIndex, 1)
+    writeProperties(properties)
+
+    return NextResponse.json({ message: 'Property deleted successfully' })
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete property' },
       { status: 500 }
     )
   }

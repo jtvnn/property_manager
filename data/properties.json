@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1761175735052wm4d2c41b",
+    "name": "Sawmill #1",
+    "address": "123 Sawmill Hollow",
+    "city": "LaFollette",
+    "state": "TN",
+    "zipCode": "37766",
+    "type": "HOUSE",
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "squareFeet": 1000,
+    "description": "Good for single occupant.",
+    "rentAmount": 500,
+    "status": "OCCUPIED",
+    "createdAt": "2025-10-22T23:28:55.053Z",
+    "updatedAt": "2025-10-22T23:45:16.910Z",
+    "currentTenant": null,
+    "leaseCount": 0,
+    "maintenanceRequestCount": 0
+  },
+  {
+    "id": "1761177335409zo6092lpa",
+    "name": "Main Street #1",
+    "address": "414 Main Street",
+    "city": "Jacksboro",
+    "state": "TN",
+    "zipCode": "37757",
+    "type": "DUPLEX",
+    "bedrooms": 3,
+    "bathrooms": 1.5,
+    "squareFeet": 2000,
+    "description": "A good small family home.",
+    "rentAmount": 1000,
+    "status": "OCCUPIED",
+    "createdAt": "2025-10-22T23:55:35.409Z",
+    "updatedAt": "2025-10-22T23:57:25.238Z",
+    "currentTenant": null,
+    "leaseCount": 0,
+    "maintenanceRequestCount": 0
+  }
+]

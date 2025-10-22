@@ -80,7 +80,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">
-            Property Manager
+            Marlow&apos;s Property Management
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to your account
@@ -180,7 +180,7 @@ export default function LoginPage() {
                   className="text-left justify-start"
                 >
                   <div>
-                    <div className="font-medium">Property Manager</div>
+                    <div className="font-medium">Marlow&apos;s Property Management</div>
                     <div className="text-xs text-gray-500">Manage properties & tenants</div>
                   </div>
                 </Button>

@@ -17,8 +17,17 @@ const eslintConfig = [
       ".next/**",
       "out/**",
       "build/**",
+      "dist-electron/**",
+      "electron/**",
       "next-env.d.ts",
     ],
+    rules: {
+      // Relax rules for desktop app build
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "prefer-const": "warn",
+    },
   },
 ];
 

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Modal } from '@/components/ui/modal'
 import { PaymentForm } from '@/components/payment-form'
 import { PaymentDetailsModal } from '@/components/payment-details-modal'
+import { getCurrentMonth, getCurrentYear, formatCurrentMonthYear } from '@/lib/dateUtils'
 
 interface Payment {
   id: string
@@ -51,6 +52,8 @@ export default function PaymentsPage() {
       const response = await fetch('/api/payments')
       if (response.ok) {
         const data = await response.json()
+        console.log('Fetched payments:', data)
+        console.log('Pending payments:', data.filter((p: Payment) => p.status === 'PENDING'))
         setPayments(data)
       }
     } catch (error) {
@@ -168,23 +171,31 @@ export default function PaymentsPage() {
     }
   }
 
-  // Calculate summary stats
+  // Calculate summary stats (current month only)
+  const currentMonth = getCurrentMonth()
+  const currentYear = getCurrentYear()
+  
+  const isCurrentMonth = (payment: Payment) => {
+    const dueDate = new Date(payment.dueDate)
+    return dueDate.getMonth() === currentMonth && dueDate.getFullYear() === currentYear
+  }
+  
   const totalReceived = payments
-    .filter(p => p.status === 'PAID')
+    .filter(p => p.status === 'PAID' && isCurrentMonth(p))
     .reduce((sum, p) => sum + p.amount, 0)
   
   const totalPending = payments
-    .filter(p => p.status === 'PENDING')
+    .filter(p => p.status === 'PENDING' && isCurrentMonth(p))
     .reduce((sum, p) => sum + p.amount, 0)
   
   const totalOverdue = payments
-    .filter(p => p.status === 'OVERDUE')
+    .filter(p => p.status === 'OVERDUE' && isCurrentMonth(p))
     .reduce((sum, p) => sum + p.amount, 0)
 
-  // Group payments by status
-  const paidPayments = payments.filter(p => p.status === 'PAID')
-  const pendingPayments = payments.filter(p => p.status === 'PENDING')
-  const overduePayments = payments.filter(p => p.status === 'OVERDUE')
+  // Group payments by status (filter for current month only)
+  const paidPayments = payments.filter(p => p.status === 'PAID' && isCurrentMonth(p))
+  const pendingPayments = payments.filter(p => p.status === 'PENDING' && isCurrentMonth(p))
+  const overduePayments = payments.filter(p => p.status === 'OVERDUE' && isCurrentMonth(p))
 
   if (loading) {
     return <div className="p-8">Loading payments...</div>
@@ -196,7 +207,9 @@ export default function PaymentsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Payment Management</h1>
-          <p className="text-gray-600 mt-2">Track rent payments, fees, and financial transactions</p>
+          <p className="text-gray-600 mt-2">
+            Track rent payments, fees, and financial transactions for {formatCurrentMonthYear()}
+          </p>
         </div>
         <Button onClick={() => setIsAddModalOpen(true)}>
           Record Payment

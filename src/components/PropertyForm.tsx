@@ -117,9 +117,10 @@ export function PropertyForm({ isOpen, onClose, onSubmit, property, title }: Pro
     if (!formData.address.trim()) newErrors.address = 'Address is required'
     if (!formData.city.trim()) newErrors.city = 'City is required'
     if (!formData.state) newErrors.state = 'State is required'
-    if (!formData.zipCode.trim()) newErrors.zipCode = 'ZIP code is required'
-    if (!/^\d{5}(-\d{4})?$/.test(formData.zipCode)) newErrors.zipCode = 'Invalid ZIP code format'
+    // ZIP code is now optional
+    if (formData.zipCode && !/^\d{5}(-\d{4})?$/.test(formData.zipCode)) newErrors.zipCode = 'Invalid ZIP code format'
     if (formData.rentAmount <= 0) newErrors.rentAmount = 'Rent amount must be greater than 0'
+    // Property details (bedrooms, bathrooms, square feet) are now optional
     if (formData.bedrooms !== null && formData.bedrooms < 0) newErrors.bedrooms = 'Bedrooms cannot be negative'
     if (formData.bathrooms !== null && formData.bathrooms < 0) newErrors.bathrooms = 'Bathrooms cannot be negative'
     if (formData.squareFeet !== null && formData.squareFeet <= 0) newErrors.squareFeet = 'Square feet must be greater than 0'

@@ -43,13 +43,21 @@ interface Property {
   id: string
   name: string
   address: string
-  tenants: Array<{
-    id: string
-    firstName: string
-    lastName: string
-    email: string
-    phone: string
-  }>
+}
+
+interface Tenant {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+}
+
+interface Lease {
+  id: string
+  propertyId: string
+  tenantId: string
+  status: string
 }
 
 export function MaintenanceForm({ request, onSubmit, onCancel }: MaintenanceFormProps) {
@@ -71,16 +79,24 @@ export function MaintenanceForm({ request, onSubmit, onCancel }: MaintenanceForm
   })
 
   const [properties, setProperties] = useState<Property[]>([])
+  const [tenants, setTenants] = useState<Tenant[]>([])
+  const [leases, setLeases] = useState<Lease[]>([])
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
+  const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Fetch properties for the dropdown
+  // Fetch properties, tenants, and leases
   useEffect(() => {
-    const fetchProperties = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/properties')
-        if (response.ok) {
-          const propertiesData = await response.json()
+        const [propertiesRes, tenantsRes, leasesRes] = await Promise.all([
+          fetch('/api/properties'),
+          fetch('/api/tenants'),
+          fetch('/api/leases')
+        ])
+
+        if (propertiesRes.ok) {
+          const propertiesData = await propertiesRes.json()
           setProperties(propertiesData)
           
           // If editing, find the selected property
@@ -89,12 +105,41 @@ export function MaintenanceForm({ request, onSubmit, onCancel }: MaintenanceForm
             setSelectedProperty(property || null)
           }
         }
+
+        if (tenantsRes.ok) {
+          const tenantsData = await tenantsRes.json()
+          setTenants(tenantsData)
+        }
+
+        if (leasesRes.ok) {
+          const leasesData = await leasesRes.json()
+          setLeases(leasesData)
+        }
       } catch (error) {
-        console.error('Failed to fetch properties:', error)
+        console.error('Failed to fetch data:', error)
       }
     }
-    fetchProperties()
+    fetchData()
   }, [request])
+
+  // Update available tenants when property or leases change
+  useEffect(() => {
+    if (selectedProperty && leases.length > 0 && tenants.length > 0) {
+      // Find active leases for the selected property
+      const propertyLeases = leases.filter(
+        lease => lease.propertyId === selectedProperty.id && lease.status === 'ACTIVE'
+      )
+      
+      // Get tenants who have active leases for this property
+      const propertyTenants = tenants.filter(tenant => 
+        propertyLeases.some(lease => lease.tenantId === tenant.id)
+      )
+      
+      setAvailableTenants(propertyTenants)
+    } else {
+      setAvailableTenants([])
+    }
+  }, [selectedProperty, leases, tenants])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -279,13 +324,16 @@ export function MaintenanceForm({ request, onSubmit, onCancel }: MaintenanceForm
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
           >
             <option value="">Select a tenant</option>
-            {selectedProperty.tenants?.map((tenant) => (
+            {availableTenants.map((tenant) => (
               <option key={tenant.id} value={tenant.id}>
                 {tenant.firstName} {tenant.lastName} - {tenant.phone}
               </option>
             ))}
           </select>
           {errors.tenantId && <p className="text-red-500 text-xs mt-1">{errors.tenantId}</p>}
+          {availableTenants.length === 0 && selectedProperty && (
+            <p className="text-gray-500 text-xs mt-1">No active tenants found for this property</p>
+          )}
         </div>
       )}
 

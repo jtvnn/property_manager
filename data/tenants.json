@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1761174904284jm82xrxqh",
+    "firstName": "Jason",
+    "lastName": "Vann",
+    "email": "jasontoddvann@gmail.com",
+    "phone": "(423) 912-0268",
+    "dateOfBirth": "1976-01-15",
+    "emergencyContactName": "Linda Vann",
+    "emergencyContactPhone": "(423) 437-7871",
+    "notes": "Great person!",
+    "createdAt": "2025-10-22T23:15:04.284Z",
+    "updatedAt": "2025-10-22T23:15:04.284Z",
+    "leases": [],
+    "paymentCount": 0,
+    "maintenanceRequestCount": 0
+  },
+  {
+    "id": "1761177420852r400pj29i",
+    "firstName": "John ",
+    "lastName": "Stevens",
+    "email": "john.stevens@gmail.com",
+    "phone": "(423) 214-6133",
+    "dateOfBirth": "1978-03-05",
+    "emergencyContactName": "Leslie Stevens",
+    "emergencyContactPhone": "(423) 737-8916",
+    "notes": "Married couple",
+    "createdAt": "2025-10-22T23:57:00.852Z",
+    "updatedAt": "2025-10-22T23:57:00.852Z",
+    "leases": [],
+    "paymentCount": 0,
+    "maintenanceRequestCount": 0
+  }
+]
