@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readLeases, writeLeases, syncPropertyStatuses, Lease } from '@/lib/dataUtils'
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     
     const leases = readLeases()
@@ -36,9 +36,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const { id } = await params
     
     const leases = readLeases()
     const leaseIndex = leases.findIndex((lease: Lease) => lease.id === id)

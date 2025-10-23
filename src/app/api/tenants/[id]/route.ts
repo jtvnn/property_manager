@@ -2,6 +2,17 @@ import { NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 
+interface Tenant {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  createdAt: string
+  updatedAt: string
+  [key: string]: unknown
+}
+
 // Get data file paths
 const getDataPath = () => {
   const isDev = process.env.NODE_ENV === 'development'
@@ -42,7 +53,7 @@ function readTenants() {
   }
 }
 
-function writeTenants(tenants: any[]) {
+function writeTenants(tenants: Tenant[]) {
   ensureDataDirectory()
   try {
     fs.writeFileSync(dataFilePath, JSON.stringify(tenants, null, 2))
@@ -86,7 +97,7 @@ export async function DELETE(
     console.log(`Deleting tenant with ID: ${id}`)
     
     const tenants = readTenants()
-    const tenantIndex = tenants.findIndex((t: any) => t.id === id)
+    const tenantIndex = tenants.findIndex((t: Tenant) => t.id === id)
     
     if (tenantIndex === -1) {
       return NextResponse.json(

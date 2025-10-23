@@ -1,6 +1,45 @@
 // Shared mock data for all APIs to ensure consistency and persistence
 
-export let mockTenants = [
+interface Tenant {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  dateOfBirth: string
+  emergencyContactName: string
+  emergencyContactPhone: string
+  notes: string
+  createdAt: string
+  updatedAt: string
+  leases: Lease[]
+}
+
+interface PropertyInfo {
+  id: string
+  name: string
+  address: string
+  city: string
+  state: string
+  zipCode: string
+}
+
+interface Lease {
+  id: string
+  propertyId: string
+  tenantId?: string
+  startDate: string
+  endDate: string
+  monthlyRent: number
+  securityDeposit: number
+  status: string
+  notes?: string
+  createdAt?: string
+  updatedAt?: string
+  property?: PropertyInfo
+}
+
+export const mockTenants: Tenant[] = [
   {
     id: '1',
     firstName: 'John',
@@ -99,7 +138,7 @@ export let mockTenants = [
   }
 ]
 
-export let mockProperties = [
+export const mockProperties = [
   {
     id: '1',
     name: 'Sunset Apartments Unit 1A',
@@ -156,7 +195,7 @@ export let mockProperties = [
   }
 ]
 
-export let mockLeases = [
+export const mockLeases = [
   {
     id: '1',
     tenantId: '1',
@@ -195,7 +234,7 @@ export let mockLeases = [
   }
 ]
 
-export let mockPayments = [
+export const mockPayments = [
   {
     id: '1',
     amount: 1200,
