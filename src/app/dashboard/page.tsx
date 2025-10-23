@@ -171,7 +171,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{metrics.pendingPayments}</div>
             <p className="text-xs text-muted-foreground">
-              {metrics.openMaintenanceRequests} maintenance requests
+              payments due soon
             </p>
           </CardContent>
         </Card>
@@ -231,7 +231,7 @@ export default function DashboardPage() {
                         {payment.tenant.firstName} {payment.tenant.lastName}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Due: {new Date(payment.dueDate).toLocaleDateString()}
+                        Due: {payment.dueDate}
                       </p>
                     </div>
                     <div className="text-right">
