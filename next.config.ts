@@ -1,27 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Optimize for Electron environment
-  output: 'standalone',
+  // Remove Electron-specific configurations for Vercel deployment
   
-  // Image optimization for Electron
+  // Image optimization
   images: {
-    unoptimized: true,
+    unoptimized: false, // Enable optimization for web deployment
   },
   
   // Disable x-powered-by header
   poweredByHeader: false,
   
-  // Don't use asset prefix for API routes - only for static assets
-  trailingSlash: true,
+  // Remove trailingSlash for better web routing
+  trailingSlash: false,
   
-  // Configure webpack for Electron (only when not using Turbopack)
-  webpack: (config, { isServer }) => {
-    // Only apply Electron-specific webpack config in production
-    if (process.env.NODE_ENV === 'production' && !isServer) {
-      config.target = 'electron-renderer';
-    }
-    
+  // Standard webpack config for web deployment
+  webpack: (config) => {
     return config;
   },
 };
