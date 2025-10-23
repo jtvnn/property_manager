@@ -292,7 +292,7 @@ export default function PaymentsPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Due Date:</span>
-                      <span className="text-sm">{new Date(payment.dueDate).toLocaleDateString()}</span>
+                      <span className="text-sm">{payment.dueDate}</span>
                     </div>
                   </div>
 
@@ -355,7 +355,7 @@ export default function PaymentsPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Due Date:</span>
-                      <span className="text-sm">{new Date(payment.dueDate).toLocaleDateString()}</span>
+                      <span className="text-sm">{payment.dueDate}</span>
                     </div>
                   </div>
 

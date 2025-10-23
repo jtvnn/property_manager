@@ -32,8 +32,10 @@ interface Lease {
   tenantId: string
   startDate: string
   endDate: string
-  rentAmount: number
+  monthlyRent: number
+  securityDeposit: number
   status: string
+  notes?: string
   createdAt: string
   updatedAt: string
 }
@@ -44,8 +46,11 @@ interface Payment {
   tenantId: string
   amount: number
   dueDate: string
+  paidDate?: string
   status: string
   type: string
+  method?: string
+  notes?: string
   description?: string
   createdAt: string
   updatedAt: string
@@ -241,14 +246,10 @@ export async function GET() {
       .filter((payment) => payment.status === 'PAID' && payment.type === 'RENT')
       .reduce((sum: number, payment) => sum + payment.amount, 0)
     
-    // Monthly income - payments that were PAID in the current month
-    const monthlyIncome = populatedPayments
-      .filter((payment) => {
-        if (payment.status !== 'PAID' || !(payment as any).paidDate) return false
-        const paidDate = new Date((payment as any).paidDate)
-        return paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear
-      })
-      .reduce((sum: number, payment) => sum + payment.amount, 0)
+    // Expected monthly income from active leases
+    const expectedMonthlyIncome = leases
+      .filter((lease) => lease.status === 'ACTIVE')
+      .reduce((sum: number, lease) => sum + (lease.monthlyRent || 0), 0)
     
     const pendingPayments = populatedPayments.filter((payment) => payment.status === 'PENDING')
     const totalPendingAmount = pendingPayments.reduce((sum: number, payment) => sum + payment.amount, 0)
@@ -312,7 +313,7 @@ export async function GET() {
         openMaintenanceRequests,
         inProgressMaintenanceRequests,
         monthlyPaymentsCount: monthlyPayments.length,
-        totalMonthlyIncome: monthlyIncome,
+        totalMonthlyIncome: expectedMonthlyIncome,
         pendingPayments: pendingPayments.length,
       },
       recentActivities: recentActivities.slice(0, 10),
@@ -325,7 +326,7 @@ export async function GET() {
           // Only include payments that were paid, or had meaningful recent activity
           const updatedDate = new Date(payment.updatedAt)
           const createdDate = new Date(payment.createdAt)
-          const paidDate = (payment as any).paidDate ? new Date((payment as any).paidDate) : null
+          const paidDate = payment.paidDate ? new Date(payment.paidDate) : null
           
           // Show if: recently paid, or recently updated (but not just created)
           return (paidDate && paidDate >= thirtyDaysAgo) || 
@@ -333,8 +334,8 @@ export async function GET() {
         })
         .sort((a, b) => {
           // Sort by paid date first (if available), then by updated date
-          const aPaidDate = (a as any).paidDate ? new Date((a as any).paidDate).getTime() : 0
-          const bPaidDate = (b as any).paidDate ? new Date((b as any).paidDate).getTime() : 0
+          const aPaidDate = a.paidDate ? new Date(a.paidDate).getTime() : 0
+          const bPaidDate = b.paidDate ? new Date(b.paidDate).getTime() : 0
           const aUpdatedDate = new Date(a.updatedAt).getTime()
           const bUpdatedDate = new Date(b.updatedAt).getTime()
           
