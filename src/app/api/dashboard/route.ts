@@ -139,11 +139,12 @@ function ensureDataDirectory() {
 }
 
 function readJsonFile(filePath: string): unknown[] {
-  ensureDataDirectory()
-  if (!fs.existsSync(filePath)) {
-    return []
-  }
   try {
+    ensureDataDirectory()
+    if (!fs.existsSync(filePath)) {
+      console.log(`File does not exist: ${filePath}`)
+      return []
+    }
     const data = fs.readFileSync(filePath, 'utf8')
     return JSON.parse(data)
   } catch (error) {
@@ -164,28 +165,145 @@ export async function GET() {
     
     console.log('Properties file:', propertiesFilePath)
     console.log('Properties exists:', fs.existsSync(propertiesFilePath))
-    const properties = readJsonFile(propertiesFilePath) as Property[]
+    let properties = readJsonFile(propertiesFilePath) as Property[]
     console.log('Properties loaded:', properties.length)
     
     console.log('Tenants file:', tenantsFilePath)
     console.log('Tenants exists:', fs.existsSync(tenantsFilePath))
-    const tenants = readJsonFile(tenantsFilePath) as Tenant[]
+    let tenants = readJsonFile(tenantsFilePath) as Tenant[]
     console.log('Tenants loaded:', tenants.length)
     
     console.log('Leases file:', leasesFilePath)
     console.log('Leases exists:', fs.existsSync(leasesFilePath))
-    const leases = readJsonFile(leasesFilePath) as Lease[]
+    let leases = readJsonFile(leasesFilePath) as Lease[]
     console.log('Leases loaded:', leases.length)
     
     console.log('Payments file:', paymentsFilePath)
     console.log('Payments exists:', fs.existsSync(paymentsFilePath))
-    const payments = readJsonFile(paymentsFilePath) as Payment[]
+    let payments = readJsonFile(paymentsFilePath) as Payment[]
     console.log('Payments loaded:', payments.length)
     
     console.log('Maintenance file:', maintenanceFilePath)
     console.log('Maintenance exists:', fs.existsSync(maintenanceFilePath))
-    const maintenance = readJsonFile(maintenanceFilePath) as MaintenanceRequest[]
+    let maintenance = readJsonFile(maintenanceFilePath) as MaintenanceRequest[]
     console.log('Maintenance loaded:', maintenance.length)
+
+    // If no data files exist (e.g., on Vercel), provide demo data
+    if (properties.length === 0 && tenants.length === 0 && leases.length === 0) {
+      console.log('No data files found, using demo data')
+      properties = [
+        {
+          id: '1',
+          name: 'Sunset Apartments Unit 1A',
+          address: '123 Main Street, Unit 1A',
+          type: 'apartment',
+          bedrooms: 2,
+          bathrooms: 1,
+          rent: 500,
+          status: 'occupied',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: '2',
+          name: 'Downtown Loft Unit 5B',
+          address: '456 Oak Avenue, Unit 5B',
+          type: 'loft',
+          bedrooms: 1,
+          bathrooms: 1,
+          rent: 1000,
+          status: 'occupied',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ]
+      
+      tenants = [
+        {
+          id: '1',
+          firstName: 'John',
+          lastName: 'Smith',
+          email: 'john.smith@email.com',
+          phone: '(555) 123-4567',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: '2',
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'jane.doe@email.com',
+          phone: '(555) 987-6543',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ]
+      
+      leases = [
+        {
+          id: '1',
+          propertyId: '1',
+          tenantId: '1',
+          startDate: '2025-01-01',
+          endDate: '2025-12-31',
+          monthlyRent: 500,
+          securityDeposit: 500,
+          status: 'ACTIVE',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: '2',
+          propertyId: '2',
+          tenantId: '2',
+          startDate: '2025-01-01',
+          endDate: '2025-12-31',
+          monthlyRent: 1000,
+          securityDeposit: 1000,
+          status: 'ACTIVE',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ]
+      
+      payments = [
+        {
+          id: '1',
+          leaseId: '1',
+          tenantId: '1',
+          amount: 500,
+          dueDate: '2025-11-01',
+          status: 'PENDING',
+          type: 'RENT',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: '2',
+          leaseId: '2',
+          tenantId: '2',
+          amount: 1000,
+          dueDate: '2025-11-01',
+          status: 'PENDING',
+          type: 'RENT',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ]
+      
+      maintenance = [
+        {
+          id: '1',
+          propertyId: '1',
+          title: 'Fix leaky faucet',
+          description: 'Kitchen faucet is dripping',
+          priority: 'MEDIUM',
+          status: 'OPEN',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ]
+    }
 
     console.log('Processing data...')
     
