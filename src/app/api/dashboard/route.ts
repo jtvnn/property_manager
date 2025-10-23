@@ -76,7 +76,7 @@ function readJsonFile(filePath: string) {
 }
 
 export async function GET() {
-  console.log('=== DASHBOARD API CALLED - CLEAN VERSION ===')
+  console.log('=== DASHBOARD API CALLED - FIXED OCCUPANCY VERSION ===')
   
   try {
     // Read data files
@@ -92,7 +92,14 @@ export async function GET() {
     const totalProperties = properties.length
     const totalTenants = tenants.length
     const activeLeases = leases.filter(lease => lease.status === 'ACTIVE')
-    const occupiedProperties = activeLeases.length
+    
+    // Calculate occupied properties - count unique properties with active leases
+    const occupiedPropertyIds = new Set(activeLeases.map(lease => lease.propertyId))
+    const occupiedProperties = occupiedPropertyIds.size
+    
+    console.log('Active leases:', activeLeases.map(l => `${l.id} (property: ${l.propertyId})`))
+    console.log('Unique occupied property IDs:', Array.from(occupiedPropertyIds))
+    
     const occupancyRate = totalProperties > 0 ? Math.round((occupiedProperties / totalProperties) * 100) : 0
     const totalMonthlyIncome = activeLeases.reduce((sum, lease) => sum + lease.monthlyRent, 0)
     

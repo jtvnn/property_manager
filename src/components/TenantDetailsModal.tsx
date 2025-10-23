@@ -35,7 +35,7 @@ interface Tenant {
   notes: string
   createdAt: string
   updatedAt: string
-  leases: Lease[]
+  leases?: Lease[]
 }
 
 interface TenantDetailsModalProps {
@@ -87,8 +87,8 @@ export function TenantDetailsModal({ isOpen, onClose, tenant, onEdit, onDelete }
     return age
   }
 
-  const currentLease = tenant.leases.find(lease => lease.status === 'ACTIVE')
-  const leaseHistory = tenant.leases.filter(lease => lease.status !== 'ACTIVE')
+  const currentLease = tenant.leases?.find(lease => lease.status === 'ACTIVE') || null
+  const leaseHistory = tenant.leases?.filter(lease => lease.status !== 'ACTIVE') || []
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`${tenant.firstName} ${tenant.lastName}`} maxWidth="lg">

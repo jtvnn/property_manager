@@ -38,7 +38,7 @@ interface Tenant {
   notes: string
   createdAt: string
   updatedAt: string
-  leases: Lease[]
+  leases?: Lease[]
 }
 
 export default function TenantsPage() {
@@ -94,6 +94,12 @@ export default function TenantsPage() {
   }
 
   const getCurrentLease = (tenant: Tenant) => {
+    // Check if tenant has leases array
+    if (!tenant.leases || !Array.isArray(tenant.leases)) {
+      console.log(`Tenant ${tenant.firstName} ${tenant.lastName}: no leases array`)
+      return null
+    }
+    
     // Consider both ACTIVE and PENDING leases as current
     const currentLease = tenant.leases.find(lease => lease.status === 'ACTIVE' || lease.status === 'PENDING')
     console.log(`Tenant ${tenant.firstName} ${tenant.lastName}:`, tenant.leases.length, 'leases, current lease:', currentLease?.status)
@@ -385,7 +391,9 @@ export default function TenantsPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Previous Tenants</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {inactiveTenants.map((tenant) => {
-              const lastLease = tenant.leases[tenant.leases.length - 1]
+              const lastLease = tenant.leases && tenant.leases.length > 0 
+                ? tenant.leases[tenant.leases.length - 1] 
+                : null
               return (
                 <Card key={tenant.id} className="hover:shadow-lg transition-shadow opacity-75">
                   <CardHeader>
@@ -415,7 +423,7 @@ export default function TenantsPage() {
                           <div className="flex justify-between">
                             <span className="text-sm text-gray-600">Last Property:</span>
                             <span className="text-sm font-medium text-right">
-                              {lastLease.property.name}
+                              {lastLease.property?.name || 'Unknown Property'}
                             </span>
                           </div>
                           

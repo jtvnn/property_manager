@@ -30,5 +30,21 @@
     "leases": [],
     "paymentCount": 0,
     "maintenanceRequestCount": 0
+  },
+  {
+    "id": "1761251636877ozlpj9nzv",
+    "firstName": "Shannon",
+    "lastName": "Marlow",
+    "email": "shann@gmail.com",
+    "phone": "(423) 212-4455",
+    "dateOfBirth": "1976-04-15",
+    "emergencyContactName": "Horace Marlow",
+    "emergencyContactPhone": "(333) 487-7777",
+    "notes": "",
+    "createdAt": "2025-10-23T20:33:56.877Z",
+    "updatedAt": "2025-10-23T20:33:56.877Z",
+    "leases": [],
+    "paymentCount": 0,
+    "maintenanceRequestCount": 0
   }
 ]

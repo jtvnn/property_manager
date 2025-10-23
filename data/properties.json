@@ -38,5 +38,25 @@
     "currentTenant": null,
     "leaseCount": 0,
     "maintenanceRequestCount": 0
+  },
+  {
+    "id": "176125120865997f9evj6y",
+    "name": "South Street Unit #1",
+    "address": "83 South Street",
+    "city": "Caryville",
+    "state": "TN",
+    "zipCode": "37714",
+    "type": "HOUSE",
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "squareFeet": 1800,
+    "description": null,
+    "rentAmount": 1200,
+    "status": "OCCUPIED",
+    "createdAt": "2025-10-23T20:26:48.659Z",
+    "updatedAt": "2025-10-23T20:34:21.005Z",
+    "currentTenant": null,
+    "leaseCount": 0,
+    "maintenanceRequestCount": 0
   }
 ]
