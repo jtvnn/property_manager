@@ -282,9 +282,9 @@ export default function MaintenancePage() {
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{request.title}</h3>
-                      <p className="text-sm text-gray-600">{request.property.name}</p>
+                      <p className="text-sm text-gray-600">{request.property?.name || 'Property not found'}</p>
                     </div>
-                    <Badge variant={getStatusBadgeVariant(request.status)}>
+                    <Badge variant={getStatusBadgeVariant(request.status)} className="text-gray-800 font-semibold">
                       {request.status.replace('_', ' ')}
                     </Badge>
                   </div>
@@ -338,10 +338,10 @@ export default function MaintenancePage() {
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{request.title}</h3>
-                      <p className="text-sm text-gray-600">{request.property.name}</p>
-                      <p className="text-sm text-gray-600">{request.tenant.firstName} {request.tenant.lastName}</p>
+                      <p className="text-sm text-gray-600">{request.property?.name || 'Property not found'}</p>
+                      <p className="text-sm text-gray-600">{request.tenant ? `${request.tenant.firstName} ${request.tenant.lastName}` : 'No tenant assigned'}</p>
                     </div>
-                    <Badge variant={getStatusBadgeVariant(request.status)}>
+                    <Badge variant={getStatusBadgeVariant(request.status)} className="text-gray-800 font-semibold">
                       {request.status}
                     </Badge>
                   </div>
@@ -404,13 +404,13 @@ export default function MaintenancePage() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{request.title}</h3>
-                      <p className="text-sm text-gray-600">{request.property.name}</p>
+                      <p className="text-sm text-gray-600">{request.property?.name || 'Property not found'}</p>
                       {request.assignedTo && (
                         <p className="text-sm text-blue-600 font-medium">Assigned to: {request.assignedTo}</p>
                       )}
                     </div>
                     <div className="text-right">
-                      <Badge variant={getStatusBadgeVariant(request.status)}>
+                      <Badge variant={getStatusBadgeVariant(request.status)} className="text-gray-800 font-semibold">
                         {request.status.replace('_', ' ')}
                       </Badge>
                       <p className={`text-xs font-medium mt-1 ${getPriorityColor(request.priority)}`}>
@@ -453,7 +453,7 @@ export default function MaintenancePage() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{request.title}</h3>
-                      <p className="text-sm text-gray-600">{request.property.name}</p>
+                      <p className="text-sm text-gray-600">{request.property?.name || 'Property not found'}</p>
                       {request.assignedTo && (
                         <p className="text-sm text-blue-600 font-medium">Assigned to: {request.assignedTo}</p>
                       )}
@@ -464,7 +464,7 @@ export default function MaintenancePage() {
                       )}
                     </div>
                     <div className="text-right">
-                      <Badge variant={getStatusBadgeVariant(request.status)}>
+                      <Badge variant={getStatusBadgeVariant(request.status)} className="text-gray-800 font-semibold">
                         {request.status}
                       </Badge>
                       <p className={`text-xs font-medium mt-1 ${getPriorityColor(request.priority)}`}>
@@ -509,12 +509,12 @@ export default function MaintenancePage() {
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{request.title}</h3>
-                      <p className="text-sm text-gray-600">{request.property.name}</p>
+                      <p className="text-sm text-gray-600">{request.property?.name || 'Property not found'}</p>
                       {request.assignedTo && (
                         <p className="text-sm text-blue-600">Completed by: {request.assignedTo}</p>
                       )}
                     </div>
-                    <Badge variant={getStatusBadgeVariant(request.status)}>
+                    <Badge variant={getStatusBadgeVariant(request.status)} className="text-gray-800 font-semibold">
                       {request.status}
                     </Badge>
                   </div>

@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "1761178474586xckveph1l",
+    "title": "Need new fridge light",
+    "description": "light model #1112AB",
+    "category": "GENERAL",
+    "priority": "MEDIUM",
+    "status": "OPEN",
+    "propertyId": "1761175735052wm4d2c41b",
+    "tenantId": "1761174904284jm82xrxqh",
+    "assignedTo": "Shannon Marlow",
+    "estimatedCost": 10,
+    "actualCost": null,
+    "scheduledDate": null,
+    "completedDate": null,
+    "notes": "",
+    "createdAt": "2025-10-23T00:14:34.586Z",
+    "updatedAt": "2025-10-23T00:14:34.586Z"
+  }
+]
