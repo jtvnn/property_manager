@@ -4,12 +4,21 @@ import Link from 'next/link'
 import { AuthProvider } from '@/contexts/auth-context'
 import { AuthWrapper } from '@/components/auth-wrapper'
 import { UserMenu } from '@/components/user-menu'
+import { InstallPrompt } from '@/components/install-prompt'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Marlow\'s Property Management',
   description: 'Comprehensive property management system for small businesses',
+  manifest: '/manifest.json',
+  themeColor: '#1f2937',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Property Manager',
+  },
 }
 
 export default function RootLayout({
@@ -19,6 +28,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#1f2937" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Property Manager" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           <AuthWrapper>
@@ -60,6 +78,7 @@ export default function RootLayout({
               <main>
                 {children}
               </main>
+              <InstallPrompt />
             </div>
           </AuthWrapper>
         </AuthProvider>
