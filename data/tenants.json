@@ -62,5 +62,21 @@
     "leases": [],
     "paymentCount": 0,
     "maintenanceRequestCount": 0
+  },
+  {
+    "id": "17614873636376z2nnfso9",
+    "firstName": "Dottie",
+    "lastName": "Ward",
+    "email": "Shannonmarlow11@gmail.com",
+    "phone": "(423) 494-0954",
+    "dateOfBirth": "1975-09-25",
+    "emergencyContactName": "Shannon Marlow",
+    "emergencyContactPhone": "(423) 494-0954",
+    "notes": "Paris's Sister",
+    "createdAt": "2025-10-26T14:02:43.637Z",
+    "updatedAt": "2025-10-26T14:02:43.637Z",
+    "leases": [],
+    "paymentCount": 0,
+    "maintenanceRequestCount": 0
   }
 ]

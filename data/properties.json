@@ -78,5 +78,25 @@
     "currentTenant": null,
     "leaseCount": 0,
     "maintenanceRequestCount": 0
+  },
+  {
+    "id": "1761487225334wv2srvgtm",
+    "name": "Rocky Top House",
+    "address": "1131 South Main St.",
+    "city": "Rocky Top",
+    "state": "TN",
+    "zipCode": "37769",
+    "type": "HOUSE",
+    "bedrooms": 3,
+    "bathrooms": 1,
+    "squareFeet": 2000,
+    "description": "Hardwood Floors",
+    "rentAmount": 600,
+    "status": "OCCUPIED",
+    "createdAt": "2025-10-26T14:00:25.334Z",
+    "updatedAt": "2025-10-26T14:03:40.544Z",
+    "currentTenant": null,
+    "leaseCount": 0,
+    "maintenanceRequestCount": 0
   }
 ]
