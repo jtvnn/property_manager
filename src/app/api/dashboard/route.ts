@@ -76,7 +76,7 @@ function readJsonFile(filePath: string) {
 }
 
 export async function GET() {
-  console.log('=== DASHBOARD API CALLED - FIXED OCCUPANCY VERSION ===')
+  console.log('=== DASHBOARD API CALLED - FIXED PENDING PAYMENTS VERSION ===')
   
   try {
     // Read data files
@@ -87,6 +87,7 @@ export async function GET() {
     const maintenance = readJsonFile(path.join(dataPath, 'maintenance.json')) as MaintenanceRequest[]
 
     console.log(`Loaded: ${properties.length} properties, ${tenants.length} tenants, ${leases.length} leases`)
+    console.log('DEBUG: About to filter payments by current month')
 
     // Calculate metrics
     const totalProperties = properties.length
@@ -111,6 +112,19 @@ export async function GET() {
     }
 
     const pendingPayments = payments.filter(payment => payment.status === 'PENDING')
+    
+    // Pending payments for current month only
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+    
+    const pendingPaymentsThisMonth = pendingPayments.filter(payment => {
+      const dueDate = new Date(payment.dueDate)
+      return dueDate.getMonth() === currentMonth && dueDate.getFullYear() === currentYear
+    })
+    
+    console.log(`Total pending payments: ${pendingPayments.length}, This month: ${pendingPaymentsThisMonth.length}`)
+    
     const openMaintenanceRequests = maintenance.filter(req => req.status === 'OPEN').length
 
     // Recent payments (last 30 days)
@@ -189,7 +203,7 @@ export async function GET() {
         totalProperties,
         occupiedProperties,
         totalTenants,
-        pendingPayments: pendingPayments.length,
+        pendingPayments: pendingPaymentsThisMonth.length,
         openMaintenanceRequests,
         occupancyRate,
         totalMonthlyIncome
@@ -202,7 +216,7 @@ export async function GET() {
       totalProperties,
       totalTenants,
       totalMonthlyIncome,
-      pendingPaymentsCount: pendingPayments.length,
+      pendingPaymentsCount: pendingPaymentsThisMonth.length,
       recentPaymentsCount: recentPayments.length,
       upcomingPaymentsCount: upcomingPayments.length
     })

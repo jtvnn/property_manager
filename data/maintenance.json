@@ -5,7 +5,7 @@
     "description": "light model #1112AB",
     "category": "GENERAL",
     "priority": "MEDIUM",
-    "status": "OPEN",
+    "status": "IN_PROGRESS",
     "propertyId": "1761175735052wm4d2c41b",
     "tenantId": "1761174904284jm82xrxqh",
     "assignedTo": "Shannon Marlow",
@@ -15,6 +15,6 @@
     "completedDate": null,
     "notes": "",
     "createdAt": "2025-10-23T00:14:34.586Z",
-    "updatedAt": "2025-10-23T00:14:34.586Z"
+    "updatedAt": "2025-10-26T11:13:37.589Z"
   }
 ]

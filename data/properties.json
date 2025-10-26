@@ -58,5 +58,25 @@
     "currentTenant": null,
     "leaseCount": 0,
     "maintenanceRequestCount": 0
+  },
+  {
+    "id": "1761477124585k4ypm109y",
+    "name": "Caryville #2",
+    "address": "74 Century Street",
+    "city": "Caryville",
+    "state": "TN",
+    "zipCode": "37714",
+    "type": "STUDIO",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "squareFeet": 800,
+    "description": null,
+    "rentAmount": 700,
+    "status": "OCCUPIED",
+    "createdAt": "2025-10-26T11:12:04.586Z",
+    "updatedAt": "2025-10-26T11:13:19.981Z",
+    "currentTenant": null,
+    "leaseCount": 0,
+    "maintenanceRequestCount": 0
   }
 ]

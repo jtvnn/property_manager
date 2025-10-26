@@ -46,5 +46,21 @@
     "leases": [],
     "paymentCount": 0,
     "maintenanceRequestCount": 0
+  },
+  {
+    "id": "1761477183648ka33e4wq0",
+    "firstName": "Linda",
+    "lastName": "Vann",
+    "email": "lindavann@gmail.com",
+    "phone": "(423) 438-7788",
+    "dateOfBirth": "1949-01-05",
+    "emergencyContactName": "Chris Vann",
+    "emergencyContactPhone": "(865) 929-7746",
+    "notes": "",
+    "createdAt": "2025-10-26T11:13:03.648Z",
+    "updatedAt": "2025-10-26T11:13:03.648Z",
+    "leases": [],
+    "paymentCount": 0,
+    "maintenanceRequestCount": 0
   }
 ]
