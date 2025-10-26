@@ -22,6 +22,14 @@
 /dist-electron
 /dist-portable
 
+# executables
+*.exe
+
+# backup files
+*.backup
+*-old.*
+*-complex.*
+
 # misc
 .DS_Store
 *.pem
