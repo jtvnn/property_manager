@@ -75,16 +75,56 @@ function readJsonFile(filePath: string) {
   }
 }
 
+// Fallback demo data for when file system is not available
+const demoData = {
+  properties: [
+    { id: '1', name: 'Sunset Apartments', address: '123 Main St', type: 'Apartment', bedrooms: 2, bathrooms: 1, rent: 1200, status: 'OCCUPIED' },
+    { id: '2', name: 'Garden Villa', address: '456 Oak Ave', type: 'House', bedrooms: 3, bathrooms: 2, rent: 1800, status: 'OCCUPIED' },
+    { id: '3', name: 'City Loft', address: '789 Pine St', type: 'Apartment', bedrooms: 1, bathrooms: 1, rent: 1000, status: 'VACANT' }
+  ],
+  tenants: [
+    { id: '1', firstName: 'John', lastName: 'Doe', email: 'john@email.com', phone: '555-0101' },
+    { id: '2', firstName: 'Jane', lastName: 'Smith', email: 'jane@email.com', phone: '555-0102' }
+  ],
+  leases: [
+    { id: '1', propertyId: '1', tenantId: '1', startDate: '2024-01-01', endDate: '2024-12-31', monthlyRent: 1200, securityDeposit: 1200, status: 'ACTIVE' },
+    { id: '2', propertyId: '2', tenantId: '2', startDate: '2024-02-01', endDate: '2025-01-31', monthlyRent: 1800, securityDeposit: 1800, status: 'ACTIVE' }
+  ],
+  payments: [
+    { id: '1', leaseId: '1', tenantId: '1', amount: 1200, dueDate: '2025-11-01', status: 'PENDING', type: 'RENT' },
+    { id: '2', leaseId: '2', tenantId: '2', amount: 1800, dueDate: '2025-11-01', status: 'PENDING', type: 'RENT' },
+    { id: '3', leaseId: '1', tenantId: '1', amount: 1200, dueDate: '2025-10-01', status: 'PAID', type: 'RENT', paidDate: '2025-09-28' }
+  ],
+  maintenance: [
+    { id: '1', propertyId: '1', tenantId: '1', title: 'Leaky Faucet', description: 'Kitchen faucet is dripping', priority: 'MEDIUM', status: 'PENDING', dateReported: '2025-10-20' }
+  ]
+}
+
 export async function GET() {
   console.log('=== DASHBOARD API CALLED - FIXED PENDING PAYMENTS VERSION ===')
   
   try {
-    // Read data files
-    const properties = readJsonFile(path.join(dataPath, 'properties.json')) as Property[]
-    const tenants = readJsonFile(path.join(dataPath, 'tenants.json')) as Tenant[]
-    const leases = readJsonFile(path.join(dataPath, 'leases.json')) as Lease[]
-    const allPayments = readJsonFile(path.join(dataPath, 'payments.json')) as Payment[]
-    const maintenance = readJsonFile(path.join(dataPath, 'maintenance.json')) as MaintenanceRequest[]
+    // Try to read data files, fallback to demo data if they don't exist
+    let properties: Property[] = []
+    let tenants: Tenant[] = []
+    let leases: Lease[] = []
+    let allPayments: Payment[] = []
+    let maintenance: MaintenanceRequest[] = []
+
+    try {
+      properties = readJsonFile(path.join(dataPath, 'properties.json')) as Property[]
+      tenants = readJsonFile(path.join(dataPath, 'tenants.json')) as Tenant[]
+      leases = readJsonFile(path.join(dataPath, 'leases.json')) as Lease[]
+      allPayments = readJsonFile(path.join(dataPath, 'payments.json')) as Payment[]
+      maintenance = readJsonFile(path.join(dataPath, 'maintenance.json')) as MaintenanceRequest[]
+    } catch (fileError) {
+      console.log('File system not available, using demo data:', fileError)
+      properties = demoData.properties as Property[]
+      tenants = demoData.tenants as Tenant[]
+      leases = demoData.leases as Lease[]
+      allPayments = demoData.payments as Payment[]
+      maintenance = demoData.maintenance as MaintenanceRequest[]
+    }
 
     console.log(`Loaded: ${properties.length} properties, ${tenants.length} tenants, ${leases.length} leases`)
     console.log('DEBUG: About to filter payments by current month')

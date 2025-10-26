@@ -1,0 +1,28 @@
+{
+  "name": "property_manager_portable",
+  "version": "1.0.0",
+  "main": "server.js",
+  "bin": "server.js",
+  "pkg": {
+    "scripts": [
+      "server.js"
+    ],
+    "assets": [
+      "data/**/*",
+      "public/**/*",
+      ".next/**/*",
+      "src/**/*",
+      "components/**/*",
+      "lib/**/*"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ],
+    "outputPath": "dist"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "path": "*",
+    "fs": "*"
+  }
+}

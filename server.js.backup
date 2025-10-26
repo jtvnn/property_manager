@@ -1,0 +1,92 @@
+#!/usr/bin/env node
+
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Serve static files from .next/static and public
+app.use('/_next/static', express.static(path.join(__dirname, '.next/static')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// API routes
+const apiPath = path.join(__dirname, 'src/app/api');
+
+// Dashboard API
+app.get('/api/dashboard', (req, res) => {
+  try {
+    const dataPath = path.join(__dirname, 'data');
+    
+    // Read data files
+    const properties = JSON.parse(fs.readFileSync(path.join(dataPath, 'properties.json'), 'utf-8'));
+    const tenants = JSON.parse(fs.readFileSync(path.join(dataPath, 'tenants.json'), 'utf-8'));
+    const leases = JSON.parse(fs.readFileSync(path.join(dataPath, 'leases.json'), 'utf-8'));
+    const payments = JSON.parse(fs.readFileSync(path.join(dataPath, 'payments.json'), 'utf-8'));
+    const maintenance = JSON.parse(fs.readFileSync(path.join(dataPath, 'maintenance.json'), 'utf-8'));
+
+    // Calculate metrics
+    const totalProperties = properties.length;
+    const totalTenants = tenants.length;
+    const activeLeases = leases.filter(lease => lease.status === 'ACTIVE');
+    const occupiedPropertyIds = new Set(activeLeases.map(lease => lease.propertyId));
+    const occupiedProperties = occupiedPropertyIds.size;
+    const occupancyRate = totalProperties > 0 ? Math.round((occupiedProperties / totalProperties) * 100) : 0;
+    const totalMonthlyIncome = activeLeases.reduce((sum, lease) => sum + lease.monthlyRent, 0);
+
+    // Get current month pending payments
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    const pendingPayments = payments.filter(payment => {
+      if (payment.status !== 'PENDING') return false;
+      const dueDate = new Date(payment.dueDate);
+      return dueDate.getMonth() === currentMonth && dueDate.getFullYear() === currentYear;
+    }).length;
+
+    const pendingMaintenance = maintenance.filter(req => req.status === 'PENDING').length;
+    
+    res.json({
+      metrics: {
+        totalProperties,
+        occupiedProperties,
+        totalTenants,
+        pendingPayments,
+        openMaintenanceRequests: pendingMaintenance,
+        occupancyRate,
+        totalMonthlyIncome
+      },
+      recentPayments: payments.slice(0, 5),
+      upcomingPayments: payments.filter(p => p.status === 'PENDING').slice(0, 5)
+    });
+  } catch (error) {
+    console.error('Dashboard API error:', error);
+    res.status(500).json({ error: 'Failed to load dashboard data' });
+  }
+});
+
+// Serve the main HTML file for all other routes
+app.get('*', (req, res) => {
+  const indexPath = path.join(__dirname, 'public/index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('Property Manager - App not built. Please run npm run build first.');
+  }
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🏠 Property Manager running on http://localhost:${PORT}`);
+  console.log('📁 Serving from:', __dirname);
+  
+  // Auto-open browser (optional)
+  const open = require('open');
+  open(`http://localhost:${PORT}`).catch(() => {
+    console.log('Could not auto-open browser. Please visit http://localhost:' + PORT);
+  });
+});
+
+module.exports = app;

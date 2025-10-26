@@ -1,0 +1,9 @@
+{
+  "bin": "server.js",
+  "pkg": {
+    "scripts": ["src/app/api/**/*.js", ".next/**/*.js"],
+    "assets": [".next/**/*", "public/**/*", "data/**/*"],
+    "targets": ["win-x64"],
+    "outputPath": "dist-pkg"
+  }
+}
